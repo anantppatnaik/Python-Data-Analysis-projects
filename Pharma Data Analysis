@@ -1,0 +1,121 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score,log_loss
+from sklearn.preprocessing import LabelEncoder
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from sklearn.naive_bayes import GaussianNB
+In [100]:
+#Importing train and test csv
+train_data=pd.read_csv("train.csv")
+test_data=pd.read_csv("test.csv")
+In [101]:
+train_data.head(5)
+Out[101]:
+	id	species	margin1	margin2	margin3	margin4	margin5	margin6	margin7	margin8	...	texture55	texture56	texture57	texture58	texture59	texture60	texture61	texture62	texture63	texture64
+0	1	Acer_Opalus	0.007812	0.023438	0.023438	0.003906	0.011719	0.009766	0.027344	0.0	...	0.007812	0.000000	0.002930	0.002930	0.035156	0.0	0.0	0.004883	0.000000	0.025391
+1	2	Pterocarya_Stenoptera	0.005859	0.000000	0.031250	0.015625	0.025391	0.001953	0.019531	0.0	...	0.000977	0.000000	0.000000	0.000977	0.023438	0.0	0.0	0.000977	0.039062	0.022461
+2	3	Quercus_Hartwissiana	0.005859	0.009766	0.019531	0.007812	0.003906	0.005859	0.068359	0.0	...	0.154300	0.000000	0.005859	0.000977	0.007812	0.0	0.0	0.000000	0.020508	0.002930
+3	5	Tilia_Tomentosa	0.000000	0.003906	0.023438	0.005859	0.021484	0.019531	0.023438	0.0	...	0.000000	0.000977	0.000000	0.000000	0.020508	0.0	0.0	0.017578	0.000000	0.047852
+4	6	Quercus_Variabilis	0.005859	0.003906	0.048828	0.009766	0.013672	0.015625	0.005859	0.0	...	0.096680	0.000000	0.021484	0.000000	0.000000	0.0	0.0	0.000000	0.000000	0.031250
+5 rows × 194 columns
+In [102]:
+test_data.head(5)
+Out[102]:
+	id	margin1	margin2	margin3	margin4	margin5	margin6	margin7	margin8	margin9	...	texture55	texture56	texture57	texture58	texture59	texture60	texture61	texture62	texture63	texture64
+0	4	0.019531	0.009766	0.078125	0.011719	0.003906	0.015625	0.005859	0.0	0.005859	...	0.006836	0.000000	0.015625	0.000977	0.015625	0.0	0.0	0.000000	0.003906	0.053711
+1	7	0.007812	0.005859	0.064453	0.009766	0.003906	0.013672	0.007812	0.0	0.033203	...	0.000000	0.000000	0.006836	0.001953	0.013672	0.0	0.0	0.000977	0.037109	0.044922
+2	9	0.000000	0.000000	0.001953	0.021484	0.041016	0.000000	0.023438	0.0	0.011719	...	0.128910	0.000000	0.000977	0.000000	0.000000	0.0	0.0	0.015625	0.000000	0.000000
+3	12	0.000000	0.000000	0.009766	0.011719	0.017578	0.000000	0.003906	0.0	0.003906	...	0.012695	0.015625	0.002930	0.036133	0.013672	0.0	0.0	0.089844	0.000000	0.008789
+4	13	0.001953	0.000000	0.015625	0.009766	0.039062	0.000000	0.009766	0.0	0.005859	...	0.000000	0.042969	0.016602	0.010742	0.041016	0.0	0.0	0.007812	0.009766	0.007812
+5 rows × 193 columns
+Using Label encoder
+In [103]:
+labelencoder = LabelEncoder()
+train_data["species"] = labelencoder.fit_transform(train_data["species"])
+In [104]:
+train_data.head(5)
+Out[104]:
+	id	species	margin1	margin2	margin3	margin4	margin5	margin6	margin7	margin8	...	texture55	texture56	texture57	texture58	texture59	texture60	texture61	texture62	texture63	texture64
+0	1	3	0.007812	0.023438	0.023438	0.003906	0.011719	0.009766	0.027344	0.0	...	0.007812	0.000000	0.002930	0.002930	0.035156	0.0	0.0	0.004883	0.000000	0.025391
+1	2	49	0.005859	0.000000	0.031250	0.015625	0.025391	0.001953	0.019531	0.0	...	0.000977	0.000000	0.000000	0.000977	0.023438	0.0	0.0	0.000977	0.039062	0.022461
+2	3	65	0.005859	0.009766	0.019531	0.007812	0.003906	0.005859	0.068359	0.0	...	0.154300	0.000000	0.005859	0.000977	0.007812	0.0	0.0	0.000000	0.020508	0.002930
+3	5	94	0.000000	0.003906	0.023438	0.005859	0.021484	0.019531	0.023438	0.0	...	0.000000	0.000977	0.000000	0.000000	0.020508	0.0	0.0	0.017578	0.000000	0.047852
+4	6	84	0.005859	0.003906	0.048828	0.009766	0.013672	0.015625	0.005859	0.0	...	0.096680	0.000000	0.021484	0.000000	0.000000	0.0	0.0	0.000000	0.000000	0.031250
+5 rows × 194 columns
+Splitting train data into X and Y
+In [105]:
+X=train_data.iloc[:,2:]
+Y=train_data['species']
+In [113]:
+#Using train_test_split
+X_train,X_test,y_train,y_test=train_test_split(X,Y,test_size=0.2,random_state=6,stratify=Y)
+In [ ]:
+ 
+1.RANDOM FOREST CLASSIFIER
+In [116]:
+model=RandomForestClassifier()
+model.fit(X_train, y_train)
+y_pred=model.predict(X_test)
+print("Random Forest Classifier Accuraccy:", accuracy_score(y_test, y_pred))
+pred=model.predict_proba(X_test)
+print("The log loss: ",log_loss(y_test,pred))
+Random Forest Classifier Accuraccy: 0.9696969696969697
+The log loss:  0.809525021407779
+In [115]:
+ 
+2.DECISION TREE
+In [118]:
+model2=DecisionTreeClassifier()
+model2.fit(X_train, y_train)
+y_pred=model2.predict(X_test)
+print("Decision tree Classifier Accuraccy:", accuracy_score(y_test, y_pred))
+pred=model2.predict_proba(X_test)
+print("The log loss: ",log_loss(y_test,pred))
+Decision tree Classifier Accuraccy: 0.6818181818181818
+The log loss:  10.98961067110804
+3.NAIVE BAYES
+In [119]:
+model3=GaussianNB()
+model3.fit(X_train, y_train)
+y_pred=model3.predict(X_test)
+print("NaiveBayes Classifier Accuraccy:", accuracy_score(y_test, y_pred))
+pred=model3.predict_proba(X_test)
+print("The log loss: ",log_loss(y_test,pred))
+NaiveBayes Classifier Accuraccy: 0.5505050505050505
+The log loss:  15.52500555127177
+4.SVM
+In [121]:
+model4=SVC()
+model4.fit(X_train, y_train)
+y_pred=model4.predict(X_test)
+print("SVM Classifier Accuraccy:", accuracy_score(y_test, y_pred))
+SVM Classifier Accuraccy: 0.9191919191919192
+Random forest classifier has best accuracy from above
+Predict for test_data
+In [87]:
+test_pred=model.predict(test_data.iloc[:, 1:])
+In [88]:
+#Use label incoder inverse transform to test data
+test_data["species"] = labelencoder.inverse_transform(test_pred)
+In [89]:
+test_data
+Out[89]:
+	id	margin1	margin2	margin3	margin4	margin5	margin6	margin7	margin8	margin9	...	texture56	texture57	texture58	texture59	texture60	texture61	texture62	texture63	texture64	species
+0	4	0.019531	0.009766	0.078125	0.011719	0.003906	0.015625	0.005859	0.000000	0.005859	...	0.000000	0.015625	0.000977	0.015625	0.0	0.0	0.000000	0.003906	0.053711	Quercus_Agrifolia
+1	7	0.007812	0.005859	0.064453	0.009766	0.003906	0.013672	0.007812	0.000000	0.033203	...	0.000000	0.006836	0.001953	0.013672	0.0	0.0	0.000977	0.037109	0.044922	Quercus_Afares
+2	9	0.000000	0.000000	0.001953	0.021484	0.041016	0.000000	0.023438	0.000000	0.011719	...	0.000000	0.000977	0.000000	0.000000	0.0	0.0	0.015625	0.000000	0.000000	Acer_Circinatum
+3	12	0.000000	0.000000	0.009766	0.011719	0.017578	0.000000	0.003906	0.000000	0.003906	...	0.015625	0.002930	0.036133	0.013672	0.0	0.0	0.089844	0.000000	0.008789	Castanea_Sativa
+4	13	0.001953	0.000000	0.015625	0.009766	0.039062	0.000000	0.009766	0.000000	0.005859	...	0.042969	0.016602	0.010742	0.041016	0.0	0.0	0.007812	0.009766	0.007812	Alnus_Viridis
+...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...
+589	1576	0.000000	0.000000	0.003906	0.015625	0.041016	0.000000	0.017578	0.000000	0.005859	...	0.000000	0.004883	0.000000	0.003906	0.0	0.0	0.018555	0.000000	0.000977	Acer_Circinatum
+590	1577	0.000000	0.003906	0.003906	0.005859	0.017578	0.000000	0.017578	0.005859	0.000000	...	0.004883	0.004883	0.002930	0.009766	0.0	0.0	0.090820	0.000000	0.016602	Alnus_Rubra
+591	1579	0.017578	0.029297	0.015625	0.013672	0.003906	0.015625	0.025391	0.000000	0.000000	...	0.000000	0.028320	0.000000	0.001953	0.0	0.0	0.000000	0.042969	0.006836	Quercus_Canariensis
+592	1580	0.013672	0.009766	0.060547	0.025391	0.035156	0.025391	0.039062	0.000000	0.003906	...	0.000000	0.000977	0.000000	0.011719	0.0	0.0	0.000000	0.011719	0.018555	Quercus_Phillyraeoides
+593	1583	0.000000	0.117190	0.000000	0.019531	0.000000	0.136720	0.001953	0.005859	0.000000	...	0.012695	0.016602	0.000977	0.004883	0.0	0.0	0.015625	0.000000	0.017578	Arundinaria_Simonii
+594 rows × 194 columns
+
