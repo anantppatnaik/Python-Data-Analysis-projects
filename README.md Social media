@@ -1,0 +1,93 @@
+Domain: Social Media
+Goal: Predict whether an article will be popular (shares ≥ 1400) or unpopular.
+
+Project Overview
+
+Mashable collected metadata for ~40,000 online articles. The task is to build a classification model that predicts if an article will go viral based on its content features, sentiment, metadata, keywords, and publishing time.
+
+Dataset
+
+File: OnlineNewsPopularity.csv
+Rows: ~39,644
+Features: 60+
+Includes:
+
+Content statistics (title length, word count, token stats)
+
+Sentiment polarity metrics
+
+Channel/category indicators
+
+Day-of-week publishing flags
+
+Keyword & link metadata
+
+Target: shares
+
+Articles were labeled as:
+
+1 → shares ≥ 1400 (popular)
+
+0 → shares < 1400 (unpopular)
+
+Key Steps
+1. Data Exploration
+
+Checked dataset structure using .info(), .describe(), .head()
+
+Built a correlation heatmap
+
+Visualized publishing day vs popularity
+
+Visualized article categories vs popularity distribution
+
+2. Feature Engineering
+
+Log-transform applied to skewed numerical columns
+
+Kept sentiment-related features unchanged
+
+Dropped unsupported columns (URL, timedelta)
+
+3. Train–Test Split
+train_test_split(data[features], data['shares'], test_size=0.25, random_state=0)
+
+4. Models Trained
+
+Random Forest Classifier
+
+Bernoulli Naive Bayes
+
+k-Nearest Neighbors
+
+Support Vector Machine (RBF kernel)
+
+Results
+Model	Accuracy
+Random Forest	0.6649
+KNN	0.6070
+Naive Bayes	0.5924
+SVM (RBF, probability=True)	~0.63 (varies by run)
+
+Conclusion:
+Random Forest offers the best performance without heavy tuning.
+
+Tools & Libraries
+
+Python
+
+pandas, numpy
+
+seaborn, matplotlib
+
+scikit-learn
+
+Next Improvements
+
+Hyperparameter tuning (GridSearchCV)
+
+XGBoost for higher accuracy
+
+Balanced dataset handling
+
+Advanced NLP-based embeddings (TF-IDF on title/content)
